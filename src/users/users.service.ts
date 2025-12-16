@@ -5,18 +5,16 @@ import { hashSync as bcryptHashSync } from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  private readonly users: UserDto[] = [
-    {
-      id: '1',
-      username: 'john_doe',
-      password: 'securepassword',
-    },
-  ];
+  private readonly users: UserDto[] = [];
 
   create(newUser: UserDto) {
     newUser.id = uuid();
     newUser.password = bcryptHashSync(newUser.password, 10);
     this.users.push(newUser);
-    console.log(this.users);
+    // console.log(this.users);
+  }
+
+  findByUserName(username: string): UserDto | undefined {
+    return this.users.find((user) => user.username === username);
   }
 }
