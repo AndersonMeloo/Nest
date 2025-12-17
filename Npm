@@ -1,0 +1,54 @@
+npm install bcrypt
+npm i -D @types/bcrypt
+npm i uuid - gera id's
+npm i -D @types/uuid
+npm i @nestjs/config
+npm i @nestjs/jwt
+
+nest generate controller task
+nest generate module task
+nest generate service task
+
+nest generate module users
+nest generate controller users
+nest generate service users
+
+npm run start:debug
+
+TASK:
+Routes:
+POST: http://localhost:3000/task
+{
+  "id": "12345679",
+  "title": "title sdf",
+  "description": "description jetta",
+  "status": "status",
+  "expirationDate": "09-12-2025"
+}
+
+GET: http://localhost:3000/task/123
+
+GET: Params: http://localhost:3000/task
+
+DELETE: http://localhost:3000/task/123
+
+USERS:
+
+AUTH:
+
+create user
+POST: http://localhost:3000/users
+{
+  "username": "anderson",
+  "password": "12345678"
+}
+
+POST: http://localhost:3000/auth/login
+{
+  "username": "",
+  "password": ""
+}
+
+
+https://www.youtube.com/watch?v=XM9IWkcPhjw&list=PLpcf8hdkpCYseV2ctwAhE4dY-AQ7v5D9S&index=11
+
