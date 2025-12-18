@@ -4,6 +4,7 @@ npm i uuid - gera id's
 npm i -D @types/uuid
 npm i @nestjs/config
 npm i @nestjs/jwt
+npm i class-validator class-transformer
 
 nest generate controller task
 nest generate module task
@@ -15,40 +16,52 @@ nest generate service users
 
 npm run start:debug
 
-TASK:
-Routes:
-POST: http://localhost:3000/task
-{
-  "id": "12345679",
-  "title": "title sdf",
-  "description": "description jetta",
-  "status": "status",
-  "expirationDate": "09-12-2025"
-}
-
-GET: http://localhost:3000/task/123
-
-GET: Params: http://localhost:3000/task
-
-DELETE: http://localhost:3000/task/123
-
-USERS:
-
-AUTH:
-
-create user
+CREATE USER:
 POST: http://localhost:3000/users
 {
   "username": "anderson",
   "password": "12345678"
 }
 
+LOGIN USER:
 POST: http://localhost:3000/auth/login
 {
-  "username": "",
-  "password": ""
+  "username": "anderson",
+  "password": "12345678"
+}
+Resposta 200
+{
+  "token": "SEU_JWT_AQUI",
+  "expireIn": 3600
 }
 
+TASKS:
+Todas exigem Authorization Bearer Token
+Authorization: Bearer Token SEU_JWT_AQUI
 
-https://www.youtube.com/watch?v=XM9IWkcPhjw&list=PLpcf8hdkpCYseV2ctwAhE4dY-AQ7v5D9S&index=11
+Criar task:
+POST: http://localhost:3000/task
+{
+  "title": "Minha primeira task",
+  "description": "Descrição da task",
+  "expirationDate": "2025-12-31"
+}
 
+Listar todas as tasks:
+GET: http://localhost:3000/task
+
+Buscar task por ID: 
+GET: http://localhost:3000/task/{id}
+http://localhost:3000/task/5e15a423-995a-4d42-9fa9-793e4d1f62b7
+
+Filtrar tasks: 
+Titulo: http://localhost:3000/task?title=Minha
+Status: http://localhost:3000/task?status=TO_DO
+Titulo + Status: http://localhost:3000/task?title=Minha&status=TO_DO
+
+Atualizar Task: 
+PUT: http://localhost:3000/task
+
+Remover task:
+DELETE: http://localhost:3000/task/{id}
+http://localhost:3000/task/5e15a423-995a-4d42-9fa9-793e4d1f62b7
