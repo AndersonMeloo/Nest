@@ -24,7 +24,7 @@ export class TaskController {
   }
 
   @Get('/:id')
-  findById(@Param('id') id: string): TaskDto {
+  async findById(@Param('id') id: string): Promise<TaskDto> {
     return this.taskService.findById(id);
   }
 
