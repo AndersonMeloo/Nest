@@ -26,16 +26,16 @@ export class TaskService {
     return this.mapEntityToDto(createdTask);
   }
 
-  findById(id: string): TaskDto {
-    const foundTask = this.tasks.filter((t) => t.id === id);
-    if (foundTask.length) {
-      return foundTask[0];
+  async findById(id: string): Promise<TaskDto> {
+    const foundTask = await this.taskRepository.findOne({ where: { id } });
+    if (!foundTask) {
+      throw new HttpException(
+        `Task with id ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    throw new HttpException(
-      `Task with id ${id} not found`,
-      HttpStatus.NOT_FOUND,
-    );
+    return this.mapEntityToDto(foundTask);
   }
 
   findAll(params: FindALLParameters): TaskDto[] {
