@@ -19,8 +19,8 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post()
-  create(@Body() task: TaskDto) {
-    this.taskService.create(task);
+  async create(@Body() task: TaskDto) {
+    await this.taskService.create(task);
   }
 
   @Get('/:id')
