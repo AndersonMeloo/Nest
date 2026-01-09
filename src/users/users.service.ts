@@ -13,7 +13,7 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async reate(newUser: UserDto) {
+  async create(newUser: UserDto) {
     const userAlreadyRegistered = await this.findByUserName(newUser.username);
 
     if (userAlreadyRegistered) {
