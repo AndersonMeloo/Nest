@@ -1,16 +1,29 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { FindALLParameters, TaskDto, TaskStatusEnum } from './task.dto';
-import { v4 as uuid } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TaskEntity } from 'src/db/entities/task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TaskService {
+  constructor(
+    @InjectRepository(TaskEntity)
+    private readonly taskRepository: Repository<TaskEntity>,
+  ) {}
+
   private tasks: TaskDto[] = [];
 
-  create(task: TaskDto) {
-    task.id = uuid();
-    task.status = TaskStatusEnum.TO_DO;
-    this.tasks.push(task);
-    console.log(this.tasks);
+  async create(task: TaskDto) {
+    const taskToSave: TaskEntity = {
+      title: task.title,
+      description: task.description,
+      expirationDate: new Date(task.expirationDate),
+      status: TaskStatusEnum.TO_DO,
+    };
+
+    const createdTask = await this.taskRepository.save(taskToSave);
+
+    return this.mapEntityToDto(createdTask);
   }
 
   findById(id: string): TaskDto {
@@ -70,5 +83,19 @@ export class TaskService {
       `Task with id ${id} not found`,
       HttpStatus.BAD_REQUEST,
     );
+  }
+
+  private mapEntityToDto(taskEntity: TaskEntity): TaskDto {
+    if (!taskEntity.id) {
+      throw new Error('TaskEntity sem id');
+    }
+
+    return {
+      id: taskEntity.id,
+      title: taskEntity.title,
+      description: taskEntity.description,
+      expirationDate: taskEntity.expirationDate.toISOString(),
+      status: taskEntity.status as TaskStatusEnum,
+    };
   }
 }
