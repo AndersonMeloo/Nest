@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { FindALLParameters, TaskDto, TaskStatusEnum } from './task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from 'src/db/entities/task.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Like, Repository } from 'typeorm';
 
 @Injectable()
 export class TaskService {
@@ -38,52 +38,53 @@ export class TaskService {
     return this.mapEntityToDto(foundTask);
   }
 
-  findAll(params: FindALLParameters): TaskDto[] {
-    return this.tasks.filter((t) => {
-      let match = true;
+  async findAll(params: FindALLParameters): Promise<TaskDto[]> {
+    const searchParams: FindOptionsWhere<TaskEntity> = {};
 
-      if (params.title != undefined && !t.title.includes(params.title)) {
-        match = false;
-      }
+    if (params.title) {
+      searchParams.title = Like(`%${params.title}%`);
+    }
 
-      if (
-        params.status !== undefined &&
-        t.status !== undefined &&
-        !t.status.includes(params.status)
-      ) {
-        match = false;
-      }
+    if (params.status) {
+      searchParams.status = Like(`%${params.status}%`);
+    }
 
-      return match;
+    const tasksFound = await this.taskRepository.find({
+      where: searchParams,
     });
+
+    return tasksFound.map((taskEntity) => this.mapEntityToDto(taskEntity));
   }
 
-  update(task: TaskDto) {
-    const taskIndex = this.tasks.findIndex((t) => t.id === task.id);
-    if (taskIndex >= 0) {
-      this.tasks[taskIndex] = task;
-      return;
+  // Refactor findAll use taskEntity sql like
+
+  async update(id: string, task: TaskDto) {
+    const foundTask = await this.taskRepository.findOne({
+      where: { id },
+    });
+
+    if (!foundTask) {
+      throw new HttpException(
+        `Task with id ${id} not found`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    throw new HttpException(
-      `Task with id ${task.id} not found`,
-      HttpStatus.BAD_REQUEST,
-    );
+    await this.taskRepository.update(id, this.mapDtoToEntity(task));
   }
+  //  refactor update id:string
 
-  remove(id: string) {
-    const taskIndex = this.tasks.findIndex((t) => t.id === id);
+  async remove(id: string) {
+    const result = await this.taskRepository.delete(id);
 
-    if (taskIndex >= 0) {
-      this.tasks.splice(taskIndex, 1);
-      return;
+    if (!result.affected) {
+      throw new HttpException(
+        `Task with id ${id} not found`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-
-    throw new HttpException(
-      `Task with id ${id} not found`,
-      HttpStatus.BAD_REQUEST,
-    );
   }
+  // refactor remove  async await
 
   private mapEntityToDto(taskEntity: TaskEntity): TaskDto {
     if (!taskEntity.id) {
@@ -98,4 +99,14 @@ export class TaskService {
       status: taskEntity.status as TaskStatusEnum,
     };
   }
+
+  private mapDtoToEntity(taskDto: TaskDto): Partial<TaskEntity> {
+    return {
+      title: taskDto.title,
+      description: taskDto.description,
+      expirationDate: new Date(taskDto.expirationDate),
+      status: taskDto.status?.toString(),
+    };
+  }
+  // refactor create mapDtoToEntity
 }
