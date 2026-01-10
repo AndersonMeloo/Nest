@@ -33,14 +33,10 @@ export class TaskController {
     return this.taskService.findAll(params);
   }
 
-  // refactor get Promise
-
   @Put('/:id')
   async update(@Param() params: TaskRouteParameters, @Body() task: TaskDto) {
     await this.taskService.update(params.id, task);
   }
-
-  // refactor Put /:id route import TaskRouteParameters
 
   @Delete('/:id')
   remove(@Param('id') id: string) {

@@ -56,8 +56,6 @@ export class TaskService {
     return tasksFound.map((taskEntity) => this.mapEntityToDto(taskEntity));
   }
 
-  // Refactor findAll use taskEntity sql like
-
   async update(id: string, task: TaskDto) {
     const foundTask = await this.taskRepository.findOne({
       where: { id },
@@ -72,7 +70,6 @@ export class TaskService {
 
     await this.taskRepository.update(id, this.mapDtoToEntity(task));
   }
-  //  refactor update id:string
 
   async remove(id: string) {
     const result = await this.taskRepository.delete(id);
@@ -84,7 +81,6 @@ export class TaskService {
       );
     }
   }
-  // refactor remove  async await
 
   private mapEntityToDto(taskEntity: TaskEntity): TaskDto {
     if (!taskEntity.id) {
